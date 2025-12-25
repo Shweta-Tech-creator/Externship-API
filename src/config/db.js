@@ -12,6 +12,8 @@ export default async function connectDB() {
   try {
     const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').trim()
     const adminPassword = (process.env.ADMIN_PASSWORD || 'admin123').trim()
+    const allAdminsCount = await Admin.countDocuments({})
+    console.log(`[DEBUG] Total Admins in database: ${allAdminsCount}`);
     const adminName = 'System Admin'
 
     console.log(`[DEBUG] DB Seeding checking for email: ${adminEmail.toLowerCase()}`);
@@ -35,6 +37,6 @@ export default async function connectDB() {
       console.log('[DEBUG] Admin credentials synchronized with .env');
     }
   } catch (err) {
-    console.error('Admin seeding failed:', err.message)
+    console.error('[CRITICAL] Admin seeding/sync failed:', err);
   }
 }
