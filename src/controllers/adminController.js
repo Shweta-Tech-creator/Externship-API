@@ -67,6 +67,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   }
 
   const passwordOk = await admin.matchPassword(password);
+  console.log(`[DEBUG] LOGIN: Email len: ${normEmail.length}, Pass len: ${password.length}`);
   console.log("[DEBUG] LOGIN: Password match for", normEmail, "is", passwordOk);
 
   if (passwordOk) {
