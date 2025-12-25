@@ -36,6 +36,12 @@ app.use(cors({
 app.use(express.json())
 app.use(morgan('dev'))
 
+// Extra Debug: Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.originalUrl}`);
+  next();
+})
+
 // Serve uploaded files statically (e.g., avatars, resumes)
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
