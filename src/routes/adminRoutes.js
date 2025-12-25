@@ -1,9 +1,9 @@
 import express from "express";
-import { 
-  loginAdmin, 
-  registerAdmin, 
-  getAdminProfile, 
-  getLinkedMydbUser, 
+import {
+  loginAdmin,
+  registerAdmin,
+  getAdminProfile,
+  getLinkedMydbUser,
   getLatestMydbUser,
   getTotalUsers,
   getAllUsers,
@@ -43,7 +43,7 @@ const router = express.Router();
  *       201:
  *         description: Admin registered successfully
  */
-router.post("/register", registerAdmin);
+// router.post("/register", registerAdmin);
 
 /**
  * @swagger
