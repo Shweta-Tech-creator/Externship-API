@@ -53,44 +53,55 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const normEmail = (email || "").trim().toLowerCase();
 
-  console.log("LOGIN attempt", { email: normEmail });
+  console.log("[DEBUG] Login attempt for email:", normEmail);
   const admin = await Admin.findOne({ email: normEmail });
-  console.log("LOGIN adminFound", Boolean(admin));
 
-  const passwordOk = admin ? await admin.matchPassword(password) : false;
-  console.log("LOGIN passwordOk", passwordOk);
-  if (admin && passwordOk) {
-    let legacyUserId = null;
+  if (!admin) {
+    console.log("[DEBUG] Admin not found for email:", normEmail);
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+  const passwordOk = await admin.matchPassword(password);
+  console.log("[DEBUG] Password check outcome:", passwordOk);
+
+  if (passwordOk) {
+    // Safety Wrap for secondary operations
     try {
+      let legacyUserId = null;
       if (process.env.MYDB_URL) {
+        console.log("[DEBUG] Searching for legacy user...");
         const legacyUser = await MyDbUser.findOne({ email: normEmail }).select("_id");
         legacyUserId = legacyUser ? legacyUser._id : null;
       }
-    } catch (e) {
-      console.warn("LOGIN legacy mydb lookup failed", e?.message);
+
+      console.log("[DEBUG] Updating AdminProfile...");
+      await AdminProfile.updateOne(
+        { adminId: admin._id },
+        {
+          $set: {
+            name: admin.name,
+            email: admin.email,
+            lastLogin: new Date(),
+            ...(legacyUserId ? { mydbUserId: legacyUserId } : {}),
+          },
+          $setOnInsert: {
+            adminId: admin._id,
+          },
+        },
+        { upsert: true }
+      );
+    } catch (profileError) {
+      console.error("[DEBUG] Non-fatal error in secondary login tasks:", profileError.message);
+      // We don't throw here so the login still succeeds
     }
 
-    await AdminProfile.updateOne(
-      { adminId: admin._id },
-      {
-        $set: {
-          name: admin.name,
-          email: admin.email,
-          lastLogin: new Date(),
-          ...(legacyUserId ? { mydbUserId: legacyUserId } : {}),
-        },
-        $setOnInsert: {
-          adminId: admin._id,
-        },
-      },
-      { upsert: true }
-    );
-
+    console.log("[DEBUG] Generating Token for user ID:", admin._id);
     res.json({
       _id: admin._id,
       name: admin.name,
       email: admin.email,
-      token: generateToken(admin._id),
+      token: generateToken(admin._id.toString()),
     });
   } else {
     res.status(401);

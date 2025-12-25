@@ -14,6 +14,8 @@ export default async function connectDB() {
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123'
     const adminName = 'System Admin'
 
+    console.log(`[DEBUG] DB Seeding checking for email: ${adminEmail.toLowerCase()}`);
+
     let admin = await Admin.findOne({ email: adminEmail.toLowerCase() })
     if (!admin) {
       console.log('Seeding default admin...')
