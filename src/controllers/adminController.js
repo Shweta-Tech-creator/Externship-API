@@ -82,7 +82,9 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   }
 
   if (!admin) {
+    const allAdmins = await Admin.find({}).select("email");
     console.log("[DEBUG] LOGIN FAILED: Email not found in database:", normEmail);
+    console.log("[DEBUG] Current Admin emails in DB:", allAdmins.map(a => a.email));
     return res.status(401).json({ message: "Invalid email or password" });
   }
 
