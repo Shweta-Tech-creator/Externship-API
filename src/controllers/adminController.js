@@ -60,24 +60,24 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   console.log("[DEBUG] Login attempt for email:", normEmail);
   let admin = await Admin.findOne({ email: normEmail });
 
-  // FAIL-SAFE: If admin not found, check if collection is empty
+  // FAIL-SAFE: If admin not found, check if it matches the configured ADMIN_EMAIL
   if (!admin) {
-    const adminCount = await Admin.countDocuments({});
-    if (adminCount === 0) {
-      console.log("[DEBUG] NO ADMINS FOUND IN DB. Triggering Emergency Seeding...");
-      const email = (process.env.ADMIN_EMAIL || 'admin@gmail.com').trim().toLowerCase();
+    const targetEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').trim().toLowerCase();
+
+    if (normEmail === targetEmail) {
+      console.log("[DEBUG] Configured Admin Email not found. Triggering Emergency Seeding...");
       const password = (process.env.ADMIN_PASSWORD || 'admin123').trim();
 
       admin = new Admin({
         name: 'System Admin',
-        email,
+        email: targetEmail,
         password
       });
       await admin.save();
-      console.log("[DEBUG] Emergency Seeding Successful for:", email);
+      console.log("[DEBUG] Emergency Seeding Successful for:", targetEmail);
 
       // Re-fetch to ensure we have the hashed password and correct object
-      admin = await Admin.findOne({ email: normEmail });
+      admin = await Admin.findOne({ email: targetEmail });
     }
   }
 
