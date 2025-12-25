@@ -10,8 +10,8 @@ export default async function connectDB() {
 
   // Seed Admin if it doesn't exist
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@gmail.com'
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123'
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').trim()
+    const adminPassword = (process.env.ADMIN_PASSWORD || 'admin123').trim()
     const adminName = 'System Admin'
 
     console.log(`[DEBUG] DB Seeding checking for email: ${adminEmail.toLowerCase()}`);

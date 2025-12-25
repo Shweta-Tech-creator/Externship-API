@@ -61,13 +61,13 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   const admin = await Admin.findOne({ email: normEmail });
 
   if (!admin) {
-    console.log("[DEBUG] Admin not found for email:", normEmail);
+    console.log("[DEBUG] LOGIN FAILED: Email not found in database:", normEmail);
     res.status(401);
     throw new Error("Invalid email or password");
   }
 
   const passwordOk = await admin.matchPassword(password);
-  console.log("[DEBUG] Password check outcome:", passwordOk);
+  console.log("[DEBUG] LOGIN: Password match for", normEmail, "is", passwordOk);
 
   if (passwordOk) {
     // Safety Wrap for secondary operations
