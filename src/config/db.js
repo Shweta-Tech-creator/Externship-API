@@ -14,15 +14,21 @@ export default async function connectDB() {
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123'
     const adminName = 'System Admin'
 
-    const adminExists = await Admin.findOne({ email: adminEmail.toLowerCase() })
-    if (!adminExists) {
+    let admin = await Admin.findOne({ email: adminEmail.toLowerCase() })
+    if (!admin) {
       console.log('Seeding default admin...')
-      await Admin.create({
+      admin = new Admin({
         name: adminName,
         email: adminEmail.toLowerCase(),
         password: adminPassword
       })
+      await admin.save()
       console.log('Admin seeded successfully')
+    } else {
+      // Ensure password matches the fixed .env credential
+      admin.password = adminPassword
+      await admin.save()
+      console.log('Admin credentials synchronized with .env')
     }
   } catch (err) {
     console.error('Admin seeding failed:', err.message)
