@@ -6,7 +6,7 @@ export default async function connectDB() {
   if (!uri) throw new Error('MONGO_URL not set')
   mongoose.set('strictQuery', true)
   await mongoose.connect(uri)
-  console.log('MongoDB connected')
+  console.log(`[DEBUG] MongoDB connected to database: ${mongoose.connection.name}`)
 
   // Seed Admin if it doesn't exist
   try {
