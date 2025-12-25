@@ -1,5 +1,5 @@
 export default function errorHandler(err, req, res, next) {
-  const status = err.status || 500
+  const status = err.status || (res.statusCode >= 400 ? res.statusCode : 500)
   const message = err.message || 'Server error'
   if (status >= 500) {
     console.error(`[ERROR] ${req.method} ${req.originalUrl}:`, err)

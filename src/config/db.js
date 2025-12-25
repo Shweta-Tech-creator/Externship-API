@@ -17,20 +17,22 @@ export default async function connectDB() {
     console.log(`[DEBUG] DB Seeding checking for email: ${adminEmail.toLowerCase()}`);
 
     let admin = await Admin.findOne({ email: adminEmail.toLowerCase() })
+    console.log(`[DEBUG] DB Seeding search for ${adminEmail}: ${admin ? 'FOUND' : 'NOT FOUND'}`);
+
     if (!admin) {
-      console.log('Seeding default admin...')
+      console.log(`[DEBUG] Seeding NEW admin: ${adminEmail}`);
       admin = new Admin({
         name: adminName,
         email: adminEmail.toLowerCase(),
         password: adminPassword
       })
       await admin.save()
-      console.log('Admin seeded successfully')
+      console.log('[DEBUG] Admin seeded successfully');
     } else {
-      // Ensure password matches the fixed .env credential
+      console.log(`[DEBUG] Synchronizing password for: ${adminEmail}`);
       admin.password = adminPassword
       await admin.save()
-      console.log('Admin credentials synchronized with .env')
+      console.log('[DEBUG] Admin credentials synchronized with .env');
     }
   } catch (err) {
     console.error('Admin seeding failed:', err.message)

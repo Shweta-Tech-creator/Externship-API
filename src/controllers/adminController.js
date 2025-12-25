@@ -62,8 +62,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
   if (!admin) {
     console.log("[DEBUG] LOGIN FAILED: Email not found in database:", normEmail);
-    res.status(401);
-    throw new Error("Invalid email or password");
+    return res.status(401).json({ message: "Invalid email or password" });
   }
 
   const passwordOk = await admin.matchPassword(password);
