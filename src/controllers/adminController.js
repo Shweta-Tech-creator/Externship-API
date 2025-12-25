@@ -11,6 +11,10 @@ import MyDbUser from "../models/MyDbUser.js";
 import getMyDbConnection from "../config/mydb.js";
 
 const generateToken = (id) => {
+  if (!process.env.JWT_SECRET) {
+    console.error("[CRITICAL] JWT_SECRET is not defined in environment variables");
+    throw new Error("Server configuration error: JWT_SECRET missing");
+  }
   // eslint-disable-next-line no-undef
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
@@ -97,11 +101,13 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     }
 
     console.log("[DEBUG] Generating Token for user ID:", admin._id);
+    const token = generateToken(admin._id.toString());
+
     res.json({
       _id: admin._id,
       name: admin.name,
       email: admin.email,
-      token: generateToken(admin._id.toString()),
+      token: token,
     });
   } else {
     res.status(401);
