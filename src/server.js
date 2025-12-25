@@ -12,12 +12,14 @@ async function start() {
     console.log('NODE_ENV:', process.env.NODE_ENV)
 
     // Essential Environment Variable Validation
-    const requiredEnv = ['MONGO_URL', 'JWT_SECRET']
+    const requiredEnv = ['MONGO_URL', 'JWT_SECRET', 'ADMIN_EMAIL', 'ADMIN_PASSWORD']
     const missing = requiredEnv.filter(k => !process.env[k])
+
+    console.log('[DEBUG] Available Env Keys:', Object.keys(process.env).filter(k => requiredEnv.includes(k)));
+
     if (missing.length > 0) {
       console.error(`[CRITICAL] Missing essential environment variables: ${missing.join(', ')}`)
       console.error('Please ensure these are set in your Render dashboard or .env file.')
-      // In production, we might want to exit, but for now we'll just log loudly
     }
 
     await connectDB()
